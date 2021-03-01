@@ -1,0 +1,8 @@
+*.wav
+*.mp3
+*.o
+*.d
+*.bin
+*.zip
+SoftDiv/div
+Wave-to-PCM/wav2bin
