@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <fp-game/apu.h>
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b));
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 static size_t loc = 0;
 static size_t count = 0;
