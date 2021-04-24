@@ -1,5 +1,5 @@
 # The name of the application to be built.
-TARGET = apu_test
+TARGET = apu_clean
 
 # The architecture being compiled for.
 ARCH = arm
@@ -9,7 +9,7 @@ COBJ = $(patsubst %.c,%.o,$(shell find . -name '*.c'))
 ASMOBJ =
 
 # Objects to be created from binary files.
-BINS = bins/champ.o
+BINS = bins/clean.o
 
 # The folders to include headers from, reletive to make
 INC = src/inc usr/inc
