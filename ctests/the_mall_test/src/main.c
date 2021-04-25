@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 // Delay in periods of 1/60 s in between increments of scrolling while holding a scrolling input
-#define BG_SCROLL_DELAY 5
+#define BG_SCROLL_DELAY 0
 
 int load_world(void)
 {
@@ -66,6 +66,21 @@ int load_world(void)
     ppu_write_pattern(world_patterns, 4, 2, 0);
 
     free(world_patterns);
+
+    // Cloud pattern to test foreground layer and ppu_write_tiles functions
+    /*pattern_addr_t cloud_pat_addr = ppu_pattern_addr(1, 0, 0);
+    pattern_t *cloud_pattern;
+    if ((cloud_pattern = malloc(sizeof(pattern_t))) == NULL)
+    {
+        printf("Malloc Cloud Pattern Failed!\n");
+        return -1;
+    }
+    ppu_load_pattern(cloud_pattern, "the_mall_src/cloud_pattern.txt");
+    ppu_write_pattern(cloud_pattern, 1, 1, cloud_pat_addr);
+
+    tile_t cloud_tiles = ppu_make_tile(cloud_pat_addr, 0, MIRROR_NONE);
+    ppu_write_tiles_horizontal(&cloud_tiles, 1, LAYER_FG, 0, 0, 40);
+    ppu_write_tiles_vertical(&cloud_tiles, 1, LAYER_FG, 0, 0, 40);*/
 
     return 0;
 }
@@ -145,14 +160,13 @@ int main(void)
     if (load_world() == -1) return -1;
 
     // Enable background tile layer
-    ppu_set_layer_enable(LAYER_BG);
-    ppu_set_scroll(LAYER_BG, 251, 250);
+    ppu_set_layer_enable(LAYER_BG);//| LAYER_FG);
 
     // Game loop locked to 60Hz
     unsigned exit_button_pressed = 0;
     int input;
-    unsigned scroll_x = 200;
-    unsigned scroll_y = 200;
+    unsigned scroll_x = 0;
+    unsigned scroll_y = 0;
     while (!exit_button_pressed)
     {
         // update input
