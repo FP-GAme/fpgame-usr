@@ -77,7 +77,7 @@ void handle_scroll_input(int input, unsigned *scroll_x, unsigned *scroll_y)
     static unsigned v_input_held = 0;
     static unsigned h_input_held = 0;
 
-    if (CON_IS_PRESSED(input, CON_BUT_UP))
+    if (CON_IS_PRESSED(input, CON_BUT_DOWN))
     {   
         if (v_input_held == 0)
         {
@@ -89,7 +89,7 @@ void handle_scroll_input(int input, unsigned *scroll_x, unsigned *scroll_y)
             v_input_held--;
         }
     }
-    else if (CON_IS_PRESSED(input, CON_BUT_DOWN))
+    else if (CON_IS_PRESSED(input, CON_BUT_UP))
     {
         if (v_input_held == 0)
         {
@@ -168,9 +168,7 @@ int main(void)
 
         // update background layer scroll based on input
         handle_scroll_input(input, &scroll_x, &scroll_y);
-        printf("STARTING SCROLL (%d, %d)\n", scroll_x, scroll_y);
-        //while (ppu_set_scroll(LAYER_BG, scroll_x, scroll_y) != 0);
-        printf("ENDING SCROLL\n");
+        while (ppu_set_scroll(LAYER_BG, scroll_x, scroll_y) != 0);
         
         // ==================
 

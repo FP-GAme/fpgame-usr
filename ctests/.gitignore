@@ -1,2 +1,5 @@
 # Ignore local tests
 localtest/
+
+# Ignore binaries
+the_mall_test/the_mall_test
