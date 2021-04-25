@@ -1,0 +1,3 @@
+# Ignore the test_src and test_out folders
+test_src/
+test_out/
