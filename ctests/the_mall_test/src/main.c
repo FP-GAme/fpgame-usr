@@ -68,7 +68,7 @@ int load_world(void)
     free(world_patterns);
 
     // Cloud pattern to test foreground layer and ppu_write_tiles functions
-    /*pattern_addr_t cloud_pat_addr = ppu_pattern_addr(1, 0, 0);
+    pattern_addr_t cloud_pat_addr = ppu_pattern_addr(1, 0, 0);
     pattern_t *cloud_pattern;
     if ((cloud_pattern = malloc(sizeof(pattern_t))) == NULL)
     {
@@ -79,8 +79,8 @@ int load_world(void)
     ppu_write_pattern(cloud_pattern, 1, 1, cloud_pat_addr);
 
     tile_t cloud_tiles = ppu_make_tile(cloud_pat_addr, 0, MIRROR_NONE);
-    ppu_write_tiles_horizontal(&cloud_tiles, 1, LAYER_FG, 0, 0, 40);
-    ppu_write_tiles_vertical(&cloud_tiles, 1, LAYER_FG, 0, 0, 40);*/
+    //ppu_write_tiles_horizontal(&cloud_tiles, 1, LAYER_FG, 63, 20, 67);
+    //ppu_write_tiles_vertical(&cloud_tiles, 1, LAYER_FG, 20, 28, 40);
 
     return 0;
 }
@@ -160,7 +160,7 @@ int main(void)
     if (load_world() == -1) return -1;
 
     // Enable background tile layer
-    ppu_set_layer_enable(LAYER_BG);//| LAYER_FG);
+    ppu_set_layer_enable(LAYER_BG | LAYER_FG);
 
     // Game loop locked to 60Hz
     unsigned exit_button_pressed = 0;
