@@ -33,14 +33,16 @@ int load_world(void)
     free(world_tiles); // unload tiles to save resources
 
     // load palettes
-    if ((world_palette = malloc(sizeof(palette_t))) == NULL)
+    if ((world_palette = malloc(2*sizeof(palette_t))) == NULL)
     {
         printf("Malloc Palette Failed!\n");
         return -1;
     }
-    ppu_load_palette(world_palette, "the_mall_src/world_palette.txt");
+    ppu_load_palette(&world_palette[0], "the_mall_src/world_palette.txt");
+    ppu_load_palette(&world_palette[1], "the_mall_src/scotty.palette");
     
-    ppu_write_palette(world_palette, LAYER_BG, 0); // write palette to VRAM
+    ppu_write_palette(&world_palette[0], LAYER_BG, 0); // write palette to VRAM
+    ppu_write_palette(&world_palette[1], LAYER_SPR, 0); // write palette to VRAM
 
     free(world_palette); // unload palette to save resources (minimal)
 
@@ -77,10 +79,23 @@ int load_world(void)
     }
     ppu_load_pattern(cloud_pattern, "the_mall_src/cloud_pattern.txt", 1, 1);
     ppu_write_pattern(cloud_pattern, 1, 1, cloud_pat_addr);
+    free(cloud_pattern);
 
     //tile_t cloud_tiles = ppu_make_tile(cloud_pat_addr, 0, MIRROR_NONE);
     //ppu_write_tiles_horizontal(&cloud_tiles, 1, LAYER_FG, 63, 20, 67);
     //ppu_write_tiles_vertical(&cloud_tiles, 1, LAYER_FG, 20, 28, 40);
+
+    // Cloud pattern to test sprites
+    pattern_addr_t sprites_pat_addr = ppu_pattern_addr(2, 0, 0);
+    pattern_t *scotty_pattern;
+    if ((scotty_pattern = malloc(2*2*sizeof(pattern_t))) == NULL)
+    {
+        printf("Malloc Cloud Pattern Failed!\n");
+        return -1;
+    }
+    ppu_load_pattern(scotty_pattern, "the_mall_src/scotty_front-0.pattern", 1, 1);
+    ppu_write_pattern(scotty_pattern, 2, 2, sprites_pat_addr);
+    free(scotty_pattern);
 
     return 0;
 }
@@ -160,7 +175,13 @@ int main(void)
     if (load_world() == -1) return -1;
 
     // Enable background tile layer
-    ppu_set_layer_enable(LAYER_BG);//LAYER_FG);
+    ppu_set_layer_enable(LAYER_BG | LAYER_SPR);//LAYER_FG);
+
+    // Create sprite for game character
+    sprite_t scotty_sprite;
+    pattern_addr_t scotty_pattern_addr = ppu_pattern_addr(2, 0, 0);
+    ppu_make_sprite(&scotty_sprite, scotty_pattern_addr, 2, 2, 0, PRIO_IN_FRONT, MIRROR_NONE);
+    ppu_write_sprites(&scotty_sprite, 1, 0);
 
     // Game loop locked to 60Hz
     unsigned exit_button_pressed = 0;
