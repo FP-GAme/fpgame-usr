@@ -1,4 +1,4 @@
-# Turns a .csv file exported from Tiled into a .mif file for use with our Tile-RAM.
+# Turns a .csv file exported from Tiled into a .tilemap text file for use with our Tile-RAM.
 # This program is very strict about the format of the input file.
 # The input file must be:
 # * A .csv file.
@@ -17,7 +17,7 @@ def main(input_path, output_path, palette_ID):
     fr = open(input_path, 'r')
     csv_reader = csv.reader(fr, delimiter=',')
 
-    fw = open(output_path, 'w')
+    fw = open(output_path + ".tilemap", 'w')
 
     # read file into list
     # [ [tile-row 0 tiles], [tile-row 1 tiles], ..., [tile-row 63] ]
@@ -47,10 +47,12 @@ def main(input_path, output_path, palette_ID):
             # Write entry:
             prepend_space = " " if (col != 0) else ""
             append_newline = "\n" if (col == len(data_2d[0]) - 1 and row != len(data_2d) - 1) else ""
-            fw.write("%s(%03X,%X,%X)%s" % (prepend_space, pattern_addr, int(palette_ID), mirror, append_newline))
+            fw.write("%s(%03X,%X,%X)%s" % (prepend_space, pattern_addr, int(palette_ID), mirror,
+                     append_newline))
 
 if __name__ == "__main__":
     if len(sys.argv) == 4:
         main(sys.argv[1], sys.argv[2], sys.argv[3])
     else:
-        print("Expecting 3 arguments: <src .csv file>, <dest .txt file>, and <palette_ID>")
+        print("Expecting 3 arguments: <src .csv file>, <dest filename no extension>, and "
+            "<palette_ID>")

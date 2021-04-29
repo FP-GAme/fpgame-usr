@@ -10,7 +10,7 @@ def main(input_path, output_path):
     fr = open(input_path, 'r')
     lines = fr.readlines()
 
-    fw = open(output_path, 'w')
+    fw = open(output_path+".palette", 'w')
 
     # We only care about lines 5-20, since these contain color data.
     idx = 0
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         main(sys.argv[1], sys.argv[2])
     else:
-        print("Expecting 2 arguments: <src .gpl file> and <dest .txt file>")
+        print("Expecting 2 arguments: <src .gpl file> and <dest filename no extension>")
