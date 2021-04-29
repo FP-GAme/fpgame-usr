@@ -11,160 +11,112 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// Delay in periods of 1/60 s in between increments of scrolling while holding a scrolling input
-#define BG_SCROLL_DELAY 0
+// slightly slower than 8fps
+#define ANIM_DELAY 7
 
 int load_world(void)
 {
-    palette_t *world_palette;
+    // === load tilemap ===
     tile_t *world_tiles;
-    pattern_t *world_patterns;
-
-    // load tilemap
     if ((world_tiles = malloc(64 * 64 * sizeof(tile_t))) == NULL)
     {
         printf("Malloc Tiles Failed!\n");
         return -1;
     }
-    ppu_load_tilemap(world_tiles, 64*64, "the_mall_src/world_tilemap.txt");
-
+    ppu_load_tilemap(world_tiles, 64*64, "the_mall_src/the_mall.tilemap");
     ppu_write_vram(world_tiles, 64*64*sizeof(tile_t), 0); // write tilemap to VRAM
-
     free(world_tiles); // unload tiles to save resources
 
-    // load palettes
-    if ((world_palette = malloc(2*sizeof(palette_t))) == NULL)
+    // === load palettes ===
+    palette_t *palettes;
+    if ((palettes = malloc(2*sizeof(palette_t))) == NULL)
     {
         printf("Malloc Palette Failed!\n");
         return -1;
     }
-    ppu_load_palette(&world_palette[0], "the_mall_src/world_palette.txt");
-    ppu_load_palette(&world_palette[1], "the_mall_src/scotty.palette");
-    
-    ppu_write_palette(&world_palette[0], LAYER_BG, 0); // write palette to VRAM
-    ppu_write_palette(&world_palette[1], LAYER_SPR, 0); // write palette to VRAM
+    ppu_load_palette(&palettes[0], "the_mall_src/world_palette.txt");
+    ppu_load_palette(&palettes[1], "the_mall_src/scotty.palette");
+    ppu_write_palette(&palettes[0], LAYER_BG, 0);
+    ppu_write_palette(&palettes[0], LAYER_SPR, 0); // For debugging, also include tile palettes here
+    ppu_write_palette(&palettes[1], LAYER_SPR, 1);
+    free(palettes); // unload palette to save resources (minimal)
 
-    free(world_palette); // unload palette to save resources (minimal)
-
-    // load patterns
-    if ((world_patterns = malloc(sizeof(pattern_t) * 8)) == NULL)
+    // === load patterns ===
+    pattern_t *world_pattern;
+    // First, load all world tiles in one 7x1 chunk located at (1,0) (first tile is transparent)
+    if ((world_pattern = malloc(1*1*sizeof(pattern_t))) == NULL)
     {
         printf("Malloc Patterns Failed!\n");
         return -1;
     }
-
     char filename[32+1]; // +1 for NUL
     for (unsigned i = 0; i < 7; i++)
     {
         sprintf(filename, "the_mall_src/world_pattern%d.txt", i);
-        ppu_load_pattern(&world_patterns[i], filename, 1, 1);
+        ppu_load_pattern(world_pattern, filename, 1, 1);
+        ppu_write_pattern(world_pattern, 1, 1, ppu_pattern_addr(i+1,0));
     }
-    // fill the last pattern with empty (transparent)
-    for (unsigned i = 0; i < 8; i++)
-    {
-        world_patterns[7].pxrow[i] = 0;
-    }
+    free(world_pattern);
 
-    ppu_write_pattern(world_patterns, 4, 2, 0);
-
-    free(world_patterns);
-
-    // Cloud pattern to test foreground layer and ppu_write_tiles functions
-    pattern_addr_t cloud_pat_addr = ppu_pattern_addr(1, 0, 0);
-    pattern_t *cloud_pattern;
-    if ((cloud_pattern = malloc(sizeof(pattern_t))) == NULL)
-    {
-        printf("Malloc Cloud Pattern Failed!\n");
-        return -1;
-    }
-    ppu_load_pattern(cloud_pattern, "the_mall_src/cloud_pattern.txt", 1, 1);
-    ppu_write_pattern(cloud_pattern, 1, 1, cloud_pat_addr);
-    free(cloud_pattern);
-
-    //tile_t cloud_tiles = ppu_make_tile(cloud_pat_addr, 0, MIRROR_NONE);
-    //ppu_write_tiles_horizontal(&cloud_tiles, 1, LAYER_FG, 63, 20, 67);
-    //ppu_write_tiles_vertical(&cloud_tiles, 1, LAYER_FG, 20, 28, 40);
-
-    // Cloud pattern to test sprites
-    pattern_addr_t sprites_pat_addr = ppu_pattern_addr(2, 0, 0);
+    // load scotty frames (4 total)
     pattern_t *scotty_pattern;
     if ((scotty_pattern = malloc(2*2*sizeof(pattern_t))) == NULL)
     {
         printf("Malloc Cloud Pattern Failed!\n");
         return -1;
     }
-    ppu_load_pattern(scotty_pattern, "the_mall_src/scotty_front-0.pattern", 1, 1);
-    ppu_write_pattern(scotty_pattern, 2, 2, sprites_pat_addr);
+    char scotty_frame_fn[36+1]; // +1 for NUL
+    for (unsigned i = 0; i < 4; i++)
+    {
+        sprintf(scotty_frame_fn, "the_mall_src/scotty_front-%d.pattern", i);
+        ppu_load_pattern(scotty_pattern, scotty_frame_fn, 2, 2);
+        // Load each scotty frame in 2x2 chunks starting at (0, 1) and going right (2,1), ..., (6,1)
+        ppu_write_pattern(scotty_pattern, 2, 2, ppu_pattern_addr(2*i, 1));
+    }
     free(scotty_pattern);
 
     return 0;
 }
 
-void handle_scroll_input(int input, unsigned *scroll_x, unsigned *scroll_y)
+void scroll_world(int input, unsigned *scroll_x, unsigned *scroll_y)
 {
-    // For maximum responsiveness, we always want these timers to start at 0 whenever a direction is
-    //   not held. As soon as a direction is held, the scroll is updated, and the timer is started.
-    static unsigned v_input_held = 0;
-    static unsigned h_input_held = 0;
-
     if (CON_IS_PRESSED(input, CON_BUT_DOWN))
     {   
-        if (v_input_held == 0)
-        {
-            *scroll_y = (*scroll_y == 511) ? 0 : *scroll_y + 1;
-            v_input_held = BG_SCROLL_DELAY;
-        }
-        else
-        {
-            v_input_held--;
-        }
+        *scroll_y = (*scroll_y == 511) ? 0 : *scroll_y + 1;
     }
     else if (CON_IS_PRESSED(input, CON_BUT_UP))
     {
-        if (v_input_held == 0)
-        {
-            *scroll_y = (*scroll_y == 0) ? 511 : *scroll_y - 1;
-            v_input_held = BG_SCROLL_DELAY;
-        }
-        else
-        {
-            v_input_held--;
-        }
-    }
-    else
-    {
-        // nothing is being held, so reset the delay timer
-        v_input_held = 0;
+        *scroll_y = (*scroll_y == 0) ? 511 : *scroll_y - 1;
     }
 
     if (CON_IS_PRESSED(input, CON_BUT_RIGHT))
     {
-        if (h_input_held == 0)
-        {
-            *scroll_x = (*scroll_x == 511) ? 0 : *scroll_x + 1;
-            h_input_held = BG_SCROLL_DELAY;
-        }
-        else
-        {
-            h_input_held--;
-        }
+        *scroll_x = (*scroll_x == 511) ? 0 : *scroll_x + 1;
     }
     else if (CON_IS_PRESSED(input, CON_BUT_LEFT))
     {
-        if (h_input_held == 0)
-        {
-            *scroll_x = (*scroll_x == 0) ? 511 : *scroll_x - 1;
-            h_input_held = BG_SCROLL_DELAY;
-        }
-        else
-        {
-            h_input_held--;
-        }
+        *scroll_x = (*scroll_x == 0) ? 511 : *scroll_x - 1;
     }
-    else
+}
+
+void scroll_sprite(int input, unsigned *scroll_x, unsigned *scroll_y)
+{
+    if (CON_IS_PRESSED(input, CON_BUT_DOWN))
+    {   
+        *scroll_y = (*scroll_y == 239) ? 0 : *scroll_y + 1;
+    }
+    else if (CON_IS_PRESSED(input, CON_BUT_UP))
     {
-        // nothing is being held, so reset the delay timer
-        h_input_held = 0;
+        *scroll_y = (*scroll_y == 0) ? 239 : *scroll_y - 1;
+    }
+
+    if (CON_IS_PRESSED(input, CON_BUT_RIGHT))
+    {
+        *scroll_x = (*scroll_x == 319) ? 0 : *scroll_x + 1;
+    }
+    else if (CON_IS_PRESSED(input, CON_BUT_LEFT))
+    {
+        *scroll_x = (*scroll_x == 0) ? 319 : *scroll_x - 1;
     }
 }
 
@@ -174,20 +126,29 @@ int main(void)
 
     if (load_world() == -1) return -1;
 
-    // Enable background tile layer
-    ppu_set_layer_enable(LAYER_BG | LAYER_SPR);//LAYER_FG);
+    // Enable all tile layers
+    ppu_set_layer_enable(LAYER_BG | LAYER_FG | LAYER_SPR);
 
     // Create sprite for game character
+    unsigned scotty_frame = 0;
     sprite_t scotty_sprite;
-    pattern_addr_t scotty_pattern_addr = ppu_pattern_addr(2, 0, 0);
-    ppu_make_sprite(&scotty_sprite, scotty_pattern_addr, 2, 2, 0, PRIO_IN_FRONT, MIRROR_NONE);
-    ppu_write_sprites(&scotty_sprite, 1, 0);
+    scotty_sprite.pattern_addr = ppu_pattern_addr(scotty_frame*2, 1);
+    scotty_sprite.palette_id = 1;
+    scotty_sprite.mirror = MIRROR_NONE;
+    scotty_sprite.prio = PRIO_IN_FRONT;
+    scotty_sprite.x = 0;
+    scotty_sprite.y = 0;
+    scotty_sprite.height = 2;
+    scotty_sprite.width = 2;
 
     // Game loop locked to 60Hz
     unsigned exit_button_pressed = 0;
     int input;
     unsigned scroll_x = 0;
     unsigned scroll_y = 0;
+    unsigned scotty_scroll_x = 0;
+    unsigned scotty_scroll_y = 0;
+    unsigned anim_update = ANIM_DELAY;
     while (!exit_button_pressed)
     {
         // update input
@@ -202,8 +163,38 @@ int main(void)
         exit_button_pressed = CON_IS_PRESSED(input, CON_BUT_START);
 
         // update background layer scroll based on input
-        handle_scroll_input(input, &scroll_x, &scroll_y);
+        if (CON_IS_PRESSED(input, CON_BUT_A))
+        {
+            // only move tile background if A button is also pressed
+            scroll_world(input, &scroll_x, &scroll_y);
+        }
+        else
+        {
+            // otherwise, move scotty
+            scroll_sprite(input, &scotty_scroll_x, &scotty_scroll_y);
+        }
         while (ppu_set_scroll(LAYER_BG, scroll_x, scroll_y) != 0);
+
+
+        if (CON_IS_PRESSED(input, CON_BUT_B))
+        {
+            // Animate scotty if b button is being pressed
+            if (anim_update == 0)
+            {
+                scotty_frame = (scotty_frame == 3) ? 0 : scotty_frame + 1;
+                anim_update = ANIM_DELAY;
+            }
+            else
+            {
+                anim_update--;
+            }
+        }
+
+        // update sprites
+        scotty_sprite.pattern_addr = ppu_pattern_addr(scotty_frame*2, 1);
+        scotty_sprite.x = scotty_scroll_x;
+        scotty_sprite.y = scotty_scroll_y;
+        while (ppu_write_sprites(&scotty_sprite, 1, 0) != 0);
         
         // ==================
 
