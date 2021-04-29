@@ -55,7 +55,7 @@ int load_world(void)
     for (unsigned i = 0; i < 7; i++)
     {
         sprintf(filename, "the_mall_src/world_pattern%d.txt", i);
-        ppu_load_pattern(&world_patterns[i], filename);
+        ppu_load_pattern(&world_patterns[i], filename, 1, 1);
     }
     // fill the last pattern with empty (transparent)
     for (unsigned i = 0; i < 8; i++)
@@ -75,10 +75,10 @@ int load_world(void)
         printf("Malloc Cloud Pattern Failed!\n");
         return -1;
     }
-    ppu_load_pattern(cloud_pattern, "the_mall_src/cloud_pattern.txt");
+    ppu_load_pattern(cloud_pattern, "the_mall_src/cloud_pattern.txt", 1, 1);
     ppu_write_pattern(cloud_pattern, 1, 1, cloud_pat_addr);
 
-    tile_t cloud_tiles = ppu_make_tile(cloud_pat_addr, 0, MIRROR_NONE);
+    //tile_t cloud_tiles = ppu_make_tile(cloud_pat_addr, 0, MIRROR_NONE);
     //ppu_write_tiles_horizontal(&cloud_tiles, 1, LAYER_FG, 63, 20, 67);
     //ppu_write_tiles_vertical(&cloud_tiles, 1, LAYER_FG, 20, 28, 40);
 
@@ -160,7 +160,7 @@ int main(void)
     if (load_world() == -1) return -1;
 
     // Enable background tile layer
-    ppu_set_layer_enable(LAYER_BG | LAYER_FG);
+    ppu_set_layer_enable(LAYER_BG);//LAYER_FG);
 
     // Game loop locked to 60Hz
     unsigned exit_button_pressed = 0;
