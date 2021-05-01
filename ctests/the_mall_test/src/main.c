@@ -246,35 +246,45 @@ void scotty_update(sprite_t *scotty_sprite, unsigned scotty_frame, scotty_state_
 void animate_scotty(int input, unsigned *scotty_frame, scotty_state_e *scotty_state)
 {
     static unsigned scotty_anim_timer = SCOTTY_ANIM_DELAY;
-
+    unsigned button_pressed = 0;
+    
     if (CON_IS_PRESSED(input, CON_BUT_DOWN))
     {
         *scotty_state = SCOTTY_FRONT;
+        button_pressed = 1;
     }
     else if (CON_IS_PRESSED(input, CON_BUT_UP))
     {
         *scotty_state = SCOTTY_BACK;
+        button_pressed = 1;
     }
     else if (CON_IS_PRESSED(input, CON_BUT_RIGHT))
     {
         *scotty_state = SCOTTY_RSIDE;
+        button_pressed = 1;
     }
     else if (CON_IS_PRESSED(input, CON_BUT_LEFT))
     {
         *scotty_state = SCOTTY_LSIDE;
+        button_pressed = 1;
     }
     // If no direction is pressed, keep last state
 
-    if (scotty_anim_timer == 0)
+    if (scotty_anim_timer == 0 && button_pressed == 1)
     {
         // increment frame with wrap-around
         *scotty_frame = (*scotty_frame == 3) ? 0 : *scotty_frame + 1;
         // reset animation timer
         scotty_anim_timer = SCOTTY_ANIM_DELAY;
     }
-    else
+    else if (button_pressed == 1)
     {
         scotty_anim_timer--;
+    }
+    else
+    {
+        // Revert scotty to the default (standing still) frame when no buttons are pressed
+        *scotty_frame = 0;
     }
 }
 
