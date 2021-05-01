@@ -91,5 +91,5 @@ if __name__ == "__main__":
     if len(sys.argv) == 4:
         main(sys.argv[1], sys.argv[2], sys.argv[3])
     else:
-        print("Expecting 3 arguments: <src palette .txt file>, <src .c file>, and <dest filename no"
+        print("Expecting 3 arguments: <src .palette file>, <src .c file>, and <dest filename no"
         " extension>")
