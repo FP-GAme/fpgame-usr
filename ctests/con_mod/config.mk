@@ -9,11 +9,12 @@ COBJ = $(patsubst %.c,%.o,$(shell find . -name '*.c'))
 ASMOBJ =
 
 # The folders to include headers from, reletive to make
-INC = src/inc usr/inc
+-include sdk.mk
+override INC += src/inc usr/inc
 
 # Libraries to be linked to the binary.
 LIBS = -Lusr/ -lfpgame
 
 # The compiler to be used and its C flags.
 CC = arm-none-linux-gnueabihf-gcc
-CFLAGS = -std=c99
+CFLAGS = -nostdinc -std=c99

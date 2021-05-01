@@ -12,7 +12,8 @@ ASMOBJ =
 BINS = bins/champ.o
 
 # The folders to include headers from, reletive to make
-INC = src/inc usr/inc kern/inc
+-include sdk.mk
+override INC += src/inc usr/inc kern/inc
 
 # Libraries to be linked to the binary.
 LIBS = -Lusr/ -lfpgame
@@ -20,4 +21,4 @@ LIBS = -Lusr/ -lfpgame
 # The compiler to be used and its C flags.
 CC = arm-none-linux-gnueabihf-gcc
 LD = arm-none-linux-gnueabihf-ld
-CFLAGS = -std=c99
+CFLAGS = -nostdinc -std=c99
