@@ -29,6 +29,8 @@
 #define MAX_TILE_SCROLL_Y (512 - 240)
 #define MAX_SCOTTY_X (320 - 16)
 #define MAX_SCOTTY_Y (240 - 16)
+#define SCOTTY_CENTER_X ((320 - 16)>>1)
+#define SCOTTY_CENTER_Y ((240 - 16)>>1)
 
 typedef enum { SCOTTY_FRONT=0, SCOTTY_BACK=1, SCOTTY_RSIDE=2, SCOTTY_LSIDE=3 } scotty_state_e;
 
@@ -170,9 +172,12 @@ void update_scrolling(int input, unsigned *world_scroll_x, unsigned *world_scrol
 
     // TODO: I actually want to keep scotty centered...
 
+    // If scotty not centered on an axis, move scotty first.
+    // else, move the world with scotty fixed at the center.
+
     if (CON_IS_PRESSED(input, CON_BUT_DOWN))
     {
-        if (*world_scroll_y < MAX_TILE_SCROLL_Y)
+        if (*world_scroll_y < MAX_TILE_SCROLL_Y && *scotty_y == SCOTTY_CENTER_Y)
         {
             *world_scroll_y += 1;
         }
@@ -183,7 +188,7 @@ void update_scrolling(int input, unsigned *world_scroll_x, unsigned *world_scrol
     }
     else if (CON_IS_PRESSED(input, CON_BUT_UP))
     {
-        if (*world_scroll_y > 0)
+        if (*world_scroll_y > 0 && *scotty_y == SCOTTY_CENTER_Y)
         {
             *world_scroll_y -= 1;
         }
@@ -195,7 +200,7 @@ void update_scrolling(int input, unsigned *world_scroll_x, unsigned *world_scrol
 
     if (CON_IS_PRESSED(input, CON_BUT_RIGHT))
     {
-        if (*world_scroll_x < MAX_TILE_SCROLL_X)
+        if (*world_scroll_x < MAX_TILE_SCROLL_X && *scotty_x == SCOTTY_CENTER_X)
         {
             *world_scroll_x += 1;
         }
@@ -206,7 +211,7 @@ void update_scrolling(int input, unsigned *world_scroll_x, unsigned *world_scrol
     }
     else if (CON_IS_PRESSED(input, CON_BUT_LEFT))
     {
-        if (*world_scroll_x > 0)
+        if (*world_scroll_x > 0 && *scotty_x == SCOTTY_CENTER_X)
         {
             *world_scroll_x -= 1;
         }
@@ -367,6 +372,7 @@ int main(void)
         // buffer changes to VRAM
         animate_world(anim_patterns); // does not return until VRAM is written
         while (ppu_set_scroll(LAYER_BG, world_scroll_x, world_scroll_y) != 0);
+        while (ppu_set_scroll(LAYER_FG, world_scroll_x, world_scroll_y) != 0);
         while (ppu_write_sprites(&scotty_sprite, 1, SCOTTY_SPRITE_ID) != 0);
         // ==================
 
