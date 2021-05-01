@@ -108,9 +108,9 @@ int load_the_mall()
     );
     // the pink bush contains 4 rows of 5 branch tiles each, one of which will be overwritten with
     //   the base tile
-    for (unsigned i = 0; i < 5; i++)
+    for (unsigned i = 0; i < 4; i++)
     {
-        ppu_write_tiles_horizontal(&pink_bush_branch_tile, 1, LAYER_FG, 48, 26, 5);
+        ppu_write_tiles_horizontal(&pink_bush_branch_tile, 1, LAYER_FG, 48, 26+i, 5);
     }
     ppu_write_tiles_horizontal(&pink_bush_base_tile, 1, LAYER_FG, 50, 29, 1);
 
@@ -297,7 +297,8 @@ void animate_world(pattern_t *anim_patterns)
             while (ppu_write_pattern(&anim_patterns[2*i + world_anim_frame], 1, 1, ppu_pattern_addr(i+1,0)) != 0);
         }
         // end with writing dynamic patterns 8 and 9
-        while (ppu_write_pattern(&anim_patterns[10], 2, 1, ppu_pattern_addr(8,0)) != 0);
+        while (ppu_write_pattern(&anim_patterns[10+world_anim_frame], 1, 1, ppu_pattern_addr(8,0)) != 0);
+        while (ppu_write_pattern(&anim_patterns[12+world_anim_frame], 1, 1, ppu_pattern_addr(9,0)) != 0);
     }
     else
     {
@@ -364,7 +365,7 @@ int main(void)
         update_scrolling(input, &world_scroll_x, &world_scroll_y, &scotty_x, &scotty_y);
 
         // Calculate scotty animation changes depending on the direction pressed
-        animate_scotty(input, &scotty_state, &scotty_frame);
+        animate_scotty(input, &scotty_frame, &scotty_state);
 
         // perform local sprite updates
         scotty_update(&scotty_sprite, scotty_frame, scotty_state, scotty_x, scotty_y);
