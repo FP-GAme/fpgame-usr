@@ -9,7 +9,7 @@ COBJ = $(patsubst %.c,%.o,$(shell find . -name '*.c'))
 ASMOBJ =
 
 # Objects to be created from binary files.
-BINS =
+BINS = bins/scottybark.o
 
 # The folders to include headers from, reletive to make
 -include sdk.mk

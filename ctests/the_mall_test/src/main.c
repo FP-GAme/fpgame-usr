@@ -32,7 +32,12 @@
 #define SCOTTY_CENTER_X ((320 - 16)>>1)
 #define SCOTTY_CENTER_Y ((240 - 16)>>1)
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
 typedef enum { SCOTTY_FRONT=0, SCOTTY_BACK=1, SCOTTY_RSIDE=2, SCOTTY_LSIDE=3 } scotty_state_e;
+
+static unsigned bark_btn_pressed = 0;
+static unsigned start_new_bark = 0;
 
 // the filenames for all mall patterns in order of their position in Pattern RAM
 const char *the_mall_pattern_fns[] = {
@@ -316,9 +321,43 @@ void animate_world(pattern_t *anim_patterns)
     }
 }
 
+void apu_callback(const int8_t **buf, int *len)
+{
+    static size_t bark_loc = 0; // location within the scotty_bark raw audio samples
+
+    extern const int8_t _binary_bins_scottybark_bin_start[];
+    extern const int8_t _binary_bins_scottybark_bin_end[];
+    size_t bark_bin_size = (size_t) (((uintptr_t) _binary_bins_scottybark_bin_end)
+                           - ((uintptr_t) _binary_bins_scottybark_bin_start));
+
+    // Handle any queued bark (doesn't matter if bark_done or not):
+    if (start_new_bark)
+    {
+        start_new_bark = 0;
+
+        // reset bark waveform
+        bark_loc = 0;
+    }
+
+    if (bark_loc >= bark_bin_size)
+    {
+        // The waveform is finished playing. This is the done state!
+
+        // This will set the buffer to 0s, causing silence.
+        *len = 0;
+    }
+    else
+    {
+        *buf = &_binary_bins_scottybark_bin_start[bark_loc];
+        *len = MIN(bark_bin_size - bark_loc, APU_BUF_MAX);
+        bark_loc += APU_BUF_MAX;
+    }
+}
+
 int main(void)
 {
     ppu_enable();
+    apu_enable(apu_callback);
 
     if (load_the_mall() == -1) return -1;
 
@@ -371,6 +410,17 @@ int main(void)
         // check if the exit button is pressed
         exit_button_pressed = CON_IS_PRESSED(input, CON_BUT_START);
 
+        // make scotty bark if the B button is pressed
+        if (bark_btn_pressed == 0 && CON_IS_PRESSED(input, CON_BUT_B))
+        {
+            bark_btn_pressed = 1;
+            start_new_bark = 1;
+        }
+        else if (!CON_IS_PRESSED(input, CON_BUT_B))
+        {
+            bark_btn_pressed = 0;
+        }
+
         // update tile layer scrolls and scotty's position based on input
         update_scrolling(input, &world_scroll_x, &world_scroll_y, &scotty_x, &scotty_y);
 
@@ -394,5 +444,6 @@ int main(void)
     // cleanup and exit
     free(anim_patterns);
     ppu_disable();
+    apu_disable();
     return 0;
 }
