@@ -1,3 +1,13 @@
-# Ignore the test_src and test_out folders
-test_src/
-test_out/
+# Git Ignore File for user_tools
+
+# Ignore commonly used formats for our art tools
+*.tilemap
+*.pattern
+*.palette
+*.c
+*.gpl
+*.csv
+
+# Ignore commonly used formats for our audio tool recommendations
+*.raw
+*.bin
