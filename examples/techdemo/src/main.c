@@ -323,6 +323,7 @@ void animate_world(pattern_t *anim_patterns)
 void apu_callback(const int8_t **buf, int *len)
 {
     static size_t bark_loc = 0; // location within the scotty_bark raw audio samples
+    int8_t silent_buf [] = {0};
 
     extern const int8_t _binary_bins_scottybark_bin_start[];
     extern const int8_t _binary_bins_scottybark_bin_end[];
@@ -344,6 +345,10 @@ void apu_callback(const int8_t **buf, int *len)
 
         // This will set the buffer to 0s, causing silence.
         *len = 0;
+
+        // Buffer should not be used, but the APU Library mandates that we cannot send NULL, so send
+        //   anything else:
+        *buf = silent_buf;
     }
     else
     {
