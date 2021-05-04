@@ -1,5 +1,6 @@
 /* Tests the FP-GAme User Library by letting the user scroll around in "The Mall" at a pixelized 
- *   CMU. Play as CMU mascot Scotty in the most revolutionary game of 2021.
+ *   Carnegie Mellon University. Play as CMU mascot Scotty and "press B to bark" in the most
+ *   revolutionary(?) game of 2021.
  * Author: Joseph Yankel
  */
 
@@ -23,7 +24,7 @@
 // Sprite IDs
 #define SCOTTY_SPRITE_ID 0
 
-// Max scroll values for tile layer
+// Max scroll values for tile layer (Don't let scotty cross the edges of our 320x240 screen!)
 #define MAX_TILE_SCROLL_X (512 - 320)
 #define MAX_TILE_SCROLL_Y (512 - 240)
 #define MAX_SCOTTY_X (320 - 16)
@@ -33,6 +34,7 @@
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
+// Animation states for Scotty. Determines which way he is facing.
 typedef enum { SCOTTY_FRONT=0, SCOTTY_BACK=1, SCOTTY_RSIDE=2, SCOTTY_LSIDE=3 } scotty_state_e;
 
 static unsigned bark_btn_pressed = 0;
@@ -51,7 +53,7 @@ const char *the_mall_pattern_fns[] = {
     "assets/9-pink_bush_branch-0.pattern"
 };
 
-// the filenames for all dynamic patterns
+// the filenames for all dynamic patterns (used to animate world tiles)
 const char *the_mall_anim_pattern_fns[] = {
     "assets/1-grass-0.pattern",
     "assets/1-grass-1.pattern",
@@ -171,13 +173,9 @@ int load_the_mall()
 void update_scrolling(int input, unsigned *world_scroll_x, unsigned *world_scroll_y,
                       unsigned *scotty_x, unsigned *scotty_y)
 {
-    // Keep increasing/decreasing world_scroll in a direction until it hits its max/min value, then
-    //   move scotty
-
-    // TODO: I actually want to keep scotty centered...
-
     // If scotty not centered on an axis, move scotty first.
     // else, move the world with scotty fixed at the center.
+    // Don't let the screen wrap around past the 512x512 background/foreground layers.
 
     if (CON_IS_PRESSED(input, CON_BUT_DOWN))
     {
