@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['ppu_5fdisable_96',['ppu_disable',['../ppu_8h.html#adc46cd71f5ceee93199230a5fdfba32c',1,'ppu.h']]],
+  ['ppu_5fenable_97',['ppu_enable',['../ppu_8h.html#acc44d6dc3689ccaec00b32096851f3bf',1,'ppu.h']]],
+  ['ppu_5fload_5fpalette_98',['ppu_load_palette',['../ppu_8h.html#a0e3e5b4adebb78ff4b77e85807c36a03',1,'ppu.h']]],
+  ['ppu_5fload_5fpattern_99',['ppu_load_pattern',['../ppu_8h.html#a4ecc0bc1a85e3745924289beedef384c',1,'ppu.h']]],
+  ['ppu_5fload_5ftilemap_100',['ppu_load_tilemap',['../ppu_8h.html#abfc11fe38ce6a89943d3c8290cddb3e2',1,'ppu.h']]],
+  ['ppu_5fmake_5ftile_101',['ppu_make_tile',['../ppu_8h.html#ad3889f736a48ec244b94ae8c63f7a551',1,'ppu.h']]],
+  ['ppu_5fpattern_5faddr_102',['ppu_pattern_addr',['../ppu_8h.html#a91d5b847215055420f351929ef86b6c1',1,'ppu.h']]],
+  ['ppu_5fset_5fbgcolor_103',['ppu_set_bgcolor',['../ppu_8h.html#a14e62c584b431e27264b332c7aa6960a',1,'ppu.h']]],
+  ['ppu_5fset_5flayer_5fenable_104',['ppu_set_layer_enable',['../ppu_8h.html#a297679cc30eb51b87c2e66b9cff5cd93',1,'ppu.h']]],
+  ['ppu_5fset_5fscroll_105',['ppu_set_scroll',['../ppu_8h.html#abc0a2c57acc18c52af7141c6cd3ade7e',1,'ppu.h']]],
+  ['ppu_5fupdate_106',['ppu_update',['../ppu_8h.html#a259cd6bec39fded632b84a0973067ff8',1,'ppu.h']]],
+  ['ppu_5fwrite_5fpalette_107',['ppu_write_palette',['../ppu_8h.html#a6fccc2b746ff5e0828e82470284eeb30',1,'ppu.h']]],
+  ['ppu_5fwrite_5fpattern_108',['ppu_write_pattern',['../ppu_8h.html#ac31c660d8b6f4f12b7efbf0e5439830f',1,'ppu.h']]],
+  ['ppu_5fwrite_5fsprites_109',['ppu_write_sprites',['../ppu_8h.html#a8419353a1f0d742da36ad28d934ec871',1,'ppu.h']]],
+  ['ppu_5fwrite_5ftiles_5fhorizontal_110',['ppu_write_tiles_horizontal',['../ppu_8h.html#ab989eff2f5787352cb3ce7e6337f362e',1,'ppu.h']]],
+  ['ppu_5fwrite_5ftiles_5fvertical_111',['ppu_write_tiles_vertical',['../ppu_8h.html#a165804ea40ced169818719a140c3de98',1,'ppu.h']]],
+  ['ppu_5fwrite_5fvram_112',['ppu_write_vram',['../ppu_8h.html#a2a716477256941d2dedac76a89c09c17',1,'ppu.h']]]
+];
