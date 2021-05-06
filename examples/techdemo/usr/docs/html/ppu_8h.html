@@ -847,7 +847,7 @@ Invalid arguments (see the function's documentation) will result in a console wa
 <dl class="section note"><dt>Note</dt><dd>As a reminder, pattern_addr points to a specific tile at (x_i, y_i) in Pattern RAM.</dd></dl>
 <p>Starting at the initial tile pointed to by pattern_addr, a set of <code>width</code> <a class="el" href="structpattern__t.html" title="A single 8x8 tiles worth of pattern data (8 rows of 8 pixels at 4bpp) (32B of data)">pattern_t</a> by <code>height</code> <a class="el" href="structpattern__t.html" title="A single 8x8 tiles worth of pattern data (8 rows of 8 pixels at 4bpp) (32B of data)">pattern_t</a> is formed.</p>
 <p><a class="el" href="structpattern__t.html" title="A single 8x8 tiles worth of pattern data (8 rows of 8 pixels at 4bpp) (32B of data)">pattern_t</a> tile-patterns (8x8-pixel tiles) from <code>patterns</code> are written sequentially by rows of <code>width</code> until <code>height</code> rows have been written.</p>
-<p>The example diagram below demonstrates the effect of this function: </p><div class="image">
+<p>The example diagram below demonstrates the effect of this function. Note however that this diagram is shortened to a 16x16 view for readability. The actual Pattern RAM is 32x32. </p><div class="image">
 <object type="image/svg+xml" data="ppu_write_pattern_ex0.svg" style="pointer-events: none;"></object>
 </div>
 <dl class="section warning"><dt>Warning</dt><dd>It is the user's responsibility to ensure <code>patterns</code> has length <code>width</code> * <code>height</code> (in terms of <a class="el" href="structpattern__t.html" title="A single 8x8 tiles worth of pattern data (8 rows of 8 pixels at 4bpp) (32B of data)">pattern_t</a>).</dd>
