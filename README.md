@@ -27,3 +27,8 @@ to find out more about the FP-GAme hardware capabilities and the inner-workings 
 If you are an advanced user, are looking to make changes to FP-GAme hardware or system software, or
 are interesting in building the project from source, check out the FP-GAme source repository:
 https://github.com/FP-GAme/fpgame-src
+
+Note:
+The DE10-Nano's ethernet port is unsupported by FP-GAme. Before using any 3rd-party hardware
+modifications/extensions to FP-GAme using the ethernet port, be sure you fully understand their
+source.
